@@ -1,0 +1,183 @@
+<div class="tracking-container">
+  <h2>Track Your Shipment</h2>
+  <form id="tracking-form" onsubmit="event.preventDefault(); trackPackage();">
+    <input type="text" id="tracking-input" placeholder="Enter tracking number" autocomplete="off" />
+    <button type="submit">Track</button>
+  </form>
+  <div id="tracking-result"></div>
+</div>
+
+<style>
+.tracking-container {
+  max-width: 500px;
+  margin: 40px auto;
+  padding: 2em 2em 1em 2em;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.12);
+  border-radius: 10px;
+  background: #fff;
+  font-family: 'Segoe UI', Arial, sans-serif;
+}
+.tracking-container h2 {
+  text-align: center;
+  color: #174ea6;
+  margin-bottom: 1.2em;
+}
+#tracking-form {
+  display: flex;
+  gap: 10px;
+}
+#tracking-input {
+  flex: 1;
+  padding: 0.7em;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 1.1em;
+}
+#tracking-form button {
+  background: #174ea6;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  padding: 0 1.5em;
+  font-size: 1.1em;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+#tracking-form button:hover {
+  background: #0b3073;
+}
+#tracking-result {
+  margin-top: 2em;
+}
+.tracking-table {
+  border-collapse: collapse;
+  width: 100%;
+  margin-top: 10px;
+}
+.tracking-table th, .tracking-table td {
+  padding: 0.75em 0.5em;
+  text-align: left;
+}
+.tracking-table th {
+  background: #f2f6fa;
+  color: #174ea6;
+  font-weight: 600;
+}
+.tracking-table tr:not(:last-child) td {
+  border-bottom: 1px solid #e2e6ea;
+}
+.tracking-status {
+  font-weight: bold;
+  color: #222;
+}
+.tracking-location {
+  color: #174ea6;
+}
+.tracking-date {
+  font-size: 0.96em;
+  color: #888;
+}
+.error-message {
+  color: #c00;
+  text-align: center;
+  font-weight: bold;
+  margin-top: 1.5em;
+}
+</style>
+
+<script>
+// Only valid code
+const VALID_CODE = "UNDS01484335";
+
+// Expanded, realistic steps with customized wording
+const statusSteps = [
+  { status: "Shipment information received", location: "United Nations Delivery Service Hub" },
+  { status: "Order processed", location: "Main Sorting Facility" },
+  { status: "Departed origin facility", location: "Origin Facility" },
+  { status: "Arrived at export facility", location: "International Hub" },
+  { status: "Cleared export customs", location: "International Customs" },
+  { status: "Departed export facility", location: "International Hub" },
+  { status: "Arrived at import facility", location: "Customs Facility" },
+  { status: "Customs clearance completed", location: "Destination Customs" },
+  { status: "Arrived at local delivery facility", location: "Destination Facility" },
+  { status: "Out for delivery", location: "" },
+  { status: "Delivery attempted", location: "" },
+  { status: "Delivered", location: "" }
+];
+
+// Detect country by IP
+function getCountry(callback) {
+  fetch('https://ip-api.io/json/')
+    .then(res => res.json())
+    .then(data => callback(data.country || "your country"))
+    .catch(() => callback("your country"));
+}
+
+// Generate realistic past timestamps for each step
+function generateTimestamps(steps) {
+  const now = new Date();
+  let timestamps = [];
+  let stepInterval = 1000 * 60 * 60 * 5; // 5 hours
+  for (let i = steps.length - 1; i >= 0; i--) {
+    let stepTime = new Date(now.getTime() - i * (stepInterval + Math.random() * 1000 * 60 * 60));
+    timestamps.push(stepTime);
+  }
+  return timestamps;
+}
+
+function trackPackage() {
+  const code = document.getElementById("tracking-input").value.trim().toUpperCase();
+  const resultDiv = document.getElementById("tracking-result");
+  resultDiv.innerHTML = "";
+
+  if (code !== VALID_CODE) {
+    resultDiv.innerHTML = '<div class="error-message">Tracking code not found. Please check and try again.</div>';
+    return;
+  }
+
+  getCountry(function(country) {
+    const steps = statusSteps.map(step => {
+      // Use country in the last steps for realism
+      if (step.status === "Out for delivery") {
+        return { ...step, location: `Courier Facility, ${country}` };
+      }
+      if (step.status === "Delivery attempted") {
+        return { ...step, location: `${country}` };
+      }
+      if (step.status === "Delivered") {
+        return { ...step, location: `Recipient Address, ${country}` };
+      }
+      return step;
+    });
+
+    const timestamps = generateTimestamps(steps);
+
+    let tableRows = steps.map((step, idx) => `
+      <tr>
+        <td class="tracking-date">${timestamps[idx].toLocaleDateString()} ${timestamps[idx].toLocaleTimeString()}</td>
+        <td class="tracking-status">${step.status}</td>
+        <td class="tracking-location">${step.location}</td>
+      </tr>
+    `).reverse().join(""); // Most recent first
+
+    resultDiv.innerHTML = `
+      <h3>Tracking Details for: <span style="color:#174ea6">${VALID_CODE}</span></h3>
+      <table class="tracking-table">
+        <thead>
+          <tr>
+            <th>Date & Time</th>
+            <th>Status</th>
+            <th>Location</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${tableRows}
+        </tbody>
+      </table>
+      <div style="margin-top:1.3em;color:#666;font-size:.98em;text-align:center;">
+        For questions about your shipment, please contact United Nations Delivery Service customer support.
+      </div>
+    `;
+  });
+}
+</script>
