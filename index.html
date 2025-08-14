@@ -1,1 +1,75 @@
-VUVzREJCUUFBQUFJQUFlTGJVcTBBQUFBQUFBQUFBQUFBQUFBSkFBQUhhVzVrWlhndWFIUnRiRlZVQ1FBRDFMN2JZOVMrMjJQMWVBc0FBUVQxCkFRQUFCQlFBQUFBSUFBZUxiVXEwQUFBQUFBQUFBQUFBQUFBQUpBQUFIYVc1a1pYZ3VhSFJ0YkZWVUNRQUQxTDdiWTlTKzIyUDFlQXNBQVFUMQpBUUFBQkFBQUFBQUEKVUVzREJCUUFBQUFJQUFlTGJVcTFBQUFBQUFBQUFBQUFBQUFBS0FBQWFXMWhaMlZ6TDFWVUNRQUQxTDdiWTlTKzIyUDFlQXNBQVFUMUFRQUFCQlEKQUFBQUlBQWVMYlVxMUFBQUFBQUFBQUFBQUFBQUFLQUFBYVcxaFoyVnpMMVZVQ1FBRDFMN2JZOVMrMjJQMWVBc0FBUVQxQVFBQUJBQUFBQUFBClVFc0RCQlFBQUFBSUFBZUxiVXEyQUFBQUFBQUFBQUFBQUFBQU9BQUFBZEdWNGRDOVZWQWtBQTlTKzIyUFV2dHRqOVhnTEFBRUU5UUVBQUFRVQpBQUFBSUFBZUxiVXEyQUFBQUFBQUFBQUFBQUFBQU9BQUFBZEdWNGRDOVZWQWtBQTlTKzIyUFV2dHRqOVhnTEFBRUU5UUVBQUFRQUFBQUFBPT0=
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shipment Tracker</title>
+  <link rel="manifest" href="manifest.webmanifest" />
+  <meta name="theme-color" content="#2196F3" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f4f4f4;
+      text-align: center;
+    }
+    .tracking-container {
+      max-width: 400px;
+      margin: 50px auto;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+    input {
+      padding: 10px;
+      width: 80%;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    button {
+      padding: 10px 20px;
+      background: #2196F3;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #1976D2;
+    }
+    #tracking-result {
+      margin-top: 20px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div class="tracking-container">
+    <h2>Track Your Shipment</h2>
+    <form id="tracking-form" onsubmit="event.preventDefault(); trackPackage();">
+      <input type="text" id="tracking-input" placeholder="Enter tracking number" autocomplete="off" />
+      <button type="submit">Track</button>
+    </form>
+    <div id="tracking-result"></div>
+  </div>
+
+  <script>
+    function trackPackage() {
+      const trackingNumber = document.getElementById('tracking-input').value.trim();
+      const result = document.getElementById('tracking-result');
+
+      if (trackingNumber === "") {
+        result.innerHTML = "Please enter a tracking number.";
+        return;
+      }
+
+      // Example only — Replace with your API or tracking logic
+      result.innerHTML = `Tracking number <b>${trackingNumber}</b> is currently <span style="color:green">In Transit</span>.`;
+    }
+  </script>
+</body>
+</html>
